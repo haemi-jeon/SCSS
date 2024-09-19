@@ -1,0 +1,130 @@
+@import './sub', './sub2';
+
+$color: tomato;
+
+@mixin center($direction: row, $background-color: gainsboro) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background-color: $background-color;
+}
+
+@function ratio($size, $ratio) {
+  @return $size * $ratio;
+}
+
+@for $i from 1 through 10 {
+  .box:nth-child(#{$i}) {
+    width: 20px * $i;
+    background-color: white;
+  }
+}
+
+.container {
+  @include center(column, orange);
+  padding: 20px;
+  /* padding: 20px; compiled 되도 유지 */
+  // padding: 20px; compiled 되면 사라짐
+
+  h1 {
+    color: $color;
+    font: {
+      weight: bold;
+      size: 40px;
+    }
+    margin: {
+      left: 20px;
+      right: 20px;
+    }
+  }
+
+  &-text {
+    $color: royalblue; // 변수에도 scope가 존재하여 재할당 가능
+    @include center;
+    width: calc(100% - 400px);
+    font: 20px / 20px serif; // 연산이 아닌 단축 속성
+    padding: {
+      left: (100px / 5); // 괄호로 묶어줘야 단축 속성으로 인식되지 않음
+      right: 10px + 30px / 2; // 이런 경우에는 괄호 없어도 유효
+    }
+
+    p {
+      &:first-child {
+        color: $color;
+        @include center($background-color: white);
+      }
+    }
+  }
+
+  &-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 20px;
+    list-style: none;
+    background-color: gray;
+  }
+
+  &-ratio {
+    $width: 200px;
+
+    width: $width;
+    height: ratio($width, 9/16);
+    padding: 20px;
+    background-color: white;
+  }
+
+  &-color {
+    @include center($background-color: transparent);
+
+    .box {
+      $background-color: royalblue;
+
+      width: 200px;
+      height: 100px;
+      padding: 20px;
+      background-color: $background-color;
+
+      &:hover {
+        background-color: lighten($background-color, 10%);
+        // background-color: darken($background-color, 10%);
+      }
+
+      &.built-in {
+        background-color: mix($background-color, white);
+
+        &:hover {
+          // background-color: saturate($background-color, 10%);
+          // background-color: desaturate($background-color, 10%);
+          // background-color: grayscale($background-color);
+          // background-color: invert($background-color);
+          background-color: rgba($background-color, 0.2);
+        }
+      }
+    }
+  }
+
+  &-content {
+    @mixin top-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      @content;
+    }
+
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background-color: white;
+
+    .box {
+      width: 80px;
+      height: 80px;
+      @include top-left {
+        background-color: gray;
+      }
+    }
+  }
+}
